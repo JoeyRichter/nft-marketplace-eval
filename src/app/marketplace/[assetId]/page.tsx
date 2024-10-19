@@ -29,6 +29,7 @@ import {
   getAssociatedTokenAddress,
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
+import { convertLamportsToSOL, convertLamportsToUSDC, getSOLPriceInUSDC } from "@/utils/getPriceRatio";
 
 interface Product {
   name: string;
@@ -48,6 +49,18 @@ const ProductPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [price, setPrice] = useState<number>(0);
+
+  // Requirement #1
+  // Load SOL price in USDC
+  const [SOLPriceInUSDC, setSOLPriceInUSDC] = useState(0);
+
+  useEffect(() => {
+    getSOLPriceInUSDC().then(price => {
+      if (price) setSOLPriceInUSDC(price);
+      console.log("SOLPriceInUSDC:", price);
+    });
+  }, []);
+
 
   useEffect(() => {
     if (assetId) {
@@ -191,7 +204,12 @@ const ProductPage: React.FC = () => {
             </Link>
           </p>
           <div className="text-md text-gray-800 dark:text-gray-200">
-            <strong>Price:{product.price / 1000000}USDC</strong>
+            {/* Requirement #1 - Add a dropdown option for the asset price in SOL and USDC */}
+            <strong>Price:</strong>
+            <select className="ml-2 p-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+              <option value="usdc">{convertLamportsToSOL(product.price).toFixed(2)} SOL</option>
+              <option value="sol">{convertLamportsToUSDC(product.price, SOLPriceInUSDC).toFixed(2)} USDC</option>
+            </select>
           </div>
           {product.seller == publicKey?.toString() ? (
             <Button
