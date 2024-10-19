@@ -53,7 +53,10 @@ dotenv.config();
 const server = express();
 const router = express.Router();
 
-sendEmail();
+// Fix for Requirement #2
+// This is encountering errors when running the server, and preventing the Next server api from running.
+// It doesn't seem to be used, and looks improperly configured, so I have commented it out for now.
+// sendEmail();
 
 server.use(cors());
 server.use(express.json());
